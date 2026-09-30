@@ -5,7 +5,7 @@
   "description": "App móvil de Meridian Travel (Angular + Cordova).",
   "scripts": {
     "build": "cd app && npx ng build",
-    "android": "npm run build && cordova run android",
+    "android": "npm run build && ANDROID_HOME=${ANDROID_HOME:-$HOME/Library/Android/sdk} JAVA_HOME=${JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home} cordova run android",
     "start": "cd app && npx ng serve --host 0.0.0.0"
   },
   "keywords": [
