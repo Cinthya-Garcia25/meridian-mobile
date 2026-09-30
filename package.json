@@ -1,23 +1,26 @@
 {
   "name": "com.meridiantravel.app",
-  "displayName": "MeridianMobile",
+  "displayName": "Meridian Travel",
   "version": "1.0.0",
-  "description": "A sample Apache Cordova application that responds to the deviceready event.",
-  "main": "index.js",
+  "description": "App móvil de Meridian Travel (Angular + Cordova).",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "cd app && npx ng build",
+    "android": "npm run build && cordova run android",
+    "start": "cd app && npx ng serve --host 0.0.0.0"
   },
   "keywords": [
     "ecosystem:cordova"
   ],
-  "author": "Apache Cordova Team",
+  "author": "Cinthya Garcia",
   "license": "Apache-2.0",
   "devDependencies": {
+    "cordova-android": "^15.1.0",
     "cordova-browser": "^7.0.0"
   },
   "cordova": {
     "platforms": [
-      "browser"
+      "browser",
+      "android"
     ]
   }
 }

@@ -1,13 +1,25 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.meridiantravel.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>MeridianMobile</name>
+    <name>Meridian Travel</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        App móvil de Meridian Travel: destinos, inicio de sesión y registro.
     </description>
-    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
-        Apache Cordova Team
+    <author href="https://github.com/Cinthya-Garcia25/meridian-mobile">
+        Meridian Travel
     </author>
     <content src="index.html" />
+
+    <!-- Permite pedir datos a internet (Supabase, la API de la web y ConsultaWeb). -->
+    <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="mailto:*" />
+
+    <platform name="android">
+        <icon src="app/public/images/logos/logo-icon.png" />
+        <!-- Pantalla de carga con el logo de Meridian en vez del de Cordova. -->
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="app/public/images/logos/logo-icon.png" />
+        <preference name="AndroidWindowSplashScreenBackground" value="#FFFFFF" />
+    </platform>
 </widget>
