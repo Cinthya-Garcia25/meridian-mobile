@@ -1,0 +1,506 @@
+// Mismos estilos que el login de la app web (meridian-travel/frontend/src/app/pages/auth/auth.component.scss).
+$navy: #0d1f3c;
+$ocean: #4a90c4;
+$coral: #e8522a;
+$coral-dark: #c73f1c;
+$gold: #f5a623;
+$input-bg: rgba($ocean, 0.1);
+$input-bg-solid: #eaf3fb;
+
+// Reset y tipografía que en la web vienen del styles.css global.
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:host {
+  font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.signup {
+  position: relative;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+// ── Columna izquierda ──────────────────────────────────────────
+.signup__left {
+  width: 35%;
+  min-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 3rem 3rem 3rem 4rem;
+  z-index: 2;
+  // Sombra suave en vez del corte abrupto que había antes: da separación con la
+  // foto sin necesitar una forma de ola.
+  box-shadow: 12px 0 32px rgba($navy, 0.08);
+  // El registro con mensajes de error es más alto que la pantalla: se hace scroll
+  // en esta columna en vez de cortar el contenido.
+  overflow-y: auto;
+}
+
+.signup__form-wrap {
+  width: 100%;
+  max-width: 360px;
+  // margin auto centra verticalmente sin recortar la parte de arriba cuando no cabe.
+  margin: auto 0;
+}
+
+.signup__logo {
+  display: block;
+  width: 160px;
+  height: auto;
+  margin: 0 auto 0.5rem;
+}
+
+.signup__title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: $navy;
+  margin-bottom: 1.5rem;
+}
+
+.form-error {
+  background: rgba(#e5566b, 0.1);
+  color: #c73450;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+}
+
+.error-msg {
+  display: block;
+  font-size: 0.75rem;
+  color: #e5566b;
+  margin-top: -0.7rem;
+}
+
+.signup__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// ── Inputs pill ────────────────────────────────────────────────
+.pill-input {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(0deg, $input-bg, $input-bg), $input-bg-solid;
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease;
+
+  &:focus-within {
+    border-color: $ocean;
+  }
+
+  &--error {
+    border-color: #e5566b;
+  }
+}
+
+.pill-input__icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  color: $navy;
+  opacity: 0.65;
+}
+
+.pill-input input {
+  flex: 1;
+  // min-width: 0 es necesario para que un input dentro de un flex item pueda
+  // encogerse por debajo de su ancho intrínseco; sin esto, un valor largo (ej. un
+  // correo o nombre largo) empuja el input y lo hace desbordar la píldora en vez
+  // de recortarse/desplazarse dentro de su propio espacio.
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+  color: $navy;
+  font-family: inherit;
+
+  &::placeholder {
+    color: rgba($navy, 0.45);
+  }
+}
+
+.pill-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: rgba($navy, 0.45);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: $navy;
+  }
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+.form-success {
+  background: rgba($ocean, 0.1);
+  color: #2f6690;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+}
+
+.confirmar-correo {
+  background: $input-bg-solid;
+  border-radius: 0.9rem;
+  padding: 1.1rem 1.2rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba($navy, 0.8);
+}
+
+.pill-row {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.pill-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  // Dentro de la columna no hay gap de 1.1rem que compensar (a diferencia de los
+  // campos de ancho completo), así que aquí el mensaje no lleva margen negativo.
+  .error-msg {
+    margin-top: 0;
+  }
+}
+
+// ── Checkbox de términos ──────────────────────────────────────
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
+.terms__native {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.terms__box {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.15rem;
+  border-radius: 0.3rem;
+  border: 1.5px solid rgba($navy, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  svg {
+    width: 0.7rem;
+    height: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+}
+
+.terms__native:checked + .terms__box {
+  background: $coral;
+  border-color: $coral;
+
+  svg {
+    opacity: 1;
+  }
+}
+
+.terms__native:focus-visible + .terms__box {
+  outline: 2px solid $ocean;
+  outline-offset: 2px;
+}
+
+.terms--error .terms__box {
+  border-color: #e5566b;
+}
+
+.terms__text {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: rgba($navy, 0.75);
+}
+
+// ── Link para cambiar de modo ───────────────────────────────────
+.switch-mode {
+  margin-top: 1.25rem;
+  font-size: 0.82rem;
+  color: rgba($navy, 0.7);
+
+  a {
+    color: $ocean;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+// ── Botón ─────────────────────────────────────────────────────
+.signup__btn {
+  margin-top: 0.4rem;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  background: $coral;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    background: $coral-dark;
+    box-shadow: 0 6px 20px rgba($coral, 0.35);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+// ── Columna derecha: imagen ──────────────────────────────────────
+.signup__right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 68%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+
+  // Viñeta general: oscurece un poco los bordes para que la foto se sienta más
+  // integrada/editorial, además del degradado inferior que sostiene el texto.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(180deg, rgba($navy, 0.35) 0%, rgba($navy, 0) 22%),
+      linear-gradient(180deg, rgba($navy, 0) 55%, rgba($navy, 0.72) 100%),
+      linear-gradient(90deg, rgba($navy, 0.25) 0%, rgba($navy, 0) 18%);
+    pointer-events: none;
+  }
+}
+
+.signup__bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  // Zoom lento y continuo (efecto Ken Burns) para darle movimiento a la foto.
+  animation: ken-burns 24s ease-in-out infinite alternate;
+  transform-origin: 60% 70%;
+}
+
+.signup__badge {
+  position: relative;
+  z-index: 3;
+  display: inline-block;
+  background: rgba($navy, 0.55);
+  border: 1px solid rgba($gold, 0.7);
+  color: $gold;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.4rem 1.1rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+  animation: aparecer 0.8s ease-out 0.2s both;
+}
+
+.signup__overlay {
+  position: absolute;
+  left: 8%;
+  bottom: 8%;
+  z-index: 3;
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+}
+
+.signup__overlay-title {
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  animation: aparecer 0.8s ease-out 0.4s both;
+}
+
+.signup__overlay-subtitle {
+  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+  animation: aparecer 0.8s ease-out 0.6s both;
+}
+
+// El formulario entra un poco después que la foto.
+.signup__form-wrap {
+  animation: aparecer 0.7s ease-out 0.3s both;
+}
+
+// ── Animaciones ─────────────────────────────────────────────────
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.15) translate(-2%, -1%);
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── Responsive ──────────────────────────────────────────────────
+@media (max-width: 860px) {
+  :host {
+    height: auto;
+    overflow: visible;
+  }
+
+  .signup {
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    height: auto;
+    min-height: 100vh;
+    // dvh = alto visible real en el celular (descontando la barra del navegador).
+    min-height: 100dvh;
+  }
+
+  // El formulario sube sobre la foto con las esquinas superiores redondeadas.
+  .signup__left {
+    position: relative;
+    flex: 1;
+    align-items: flex-start;
+    width: 100%;
+    min-width: 0;
+    padding: 1rem 1.5rem 2rem;
+    margin-top: -28px;
+    border-radius: 28px 28px 0 0;
+    // En celular hace scroll toda la página, no esta columna (con overflow auto
+    // la columna se encogía al alto de la pantalla y cortaba el formulario).
+    overflow: visible;
+    box-shadow: 0 -8px 24px rgba($navy, 0.12);
+  }
+
+  .signup__right {
+    position: relative;
+    width: 100%;
+    height: 26vh;
+    min-height: 180px;
+  }
+
+  .signup__overlay {
+    left: 6%;
+    bottom: calc(28px + 6%);
+  }
+
+  .signup__badge {
+    font-size: 0.68rem;
+    padding: 0.3rem 0.9rem;
+  }
+
+  .signup__overlay-title {
+    font-size: 2rem;
+  }
+
+  .signup__overlay-subtitle {
+    font-size: 0.95rem;
+  }
+
+  // Login y registro empiezan arriba, justo en el borde de la card blanca, para
+  // que el logo, las pestañas y el título queden en el mismo lugar en ambas.
+  .signup__form-wrap {
+    margin: 0 auto;
+  }
+
+  // Más compacto en celular para que el botón de registro quepa sin hacer scroll.
+  .signup__logo {
+    width: 90px;
+    margin-bottom: 0.25rem;
+  }
+
+  .signup__title {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .signup__form {
+    gap: 0.8rem;
+  }
+
+  .error-msg {
+    margin-top: -0.5rem;
+  }
+}
+
+// Sin animaciones para quien las tenga desactivadas en su dispositivo.
+@media (prefers-reduced-motion: reduce) {
+  .signup__bg,
+  .signup__badge,
+  .signup__overlay-title,
+  .signup__overlay-subtitle,
+  .signup__form-wrap {
+    animation: none;
+  }
+}

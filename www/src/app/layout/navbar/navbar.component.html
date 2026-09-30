@@ -1,0 +1,54 @@
+<header class="navbar-wrapper" [class.scrolled]="navScrolled()">
+  <nav class="main-nav">
+    <div class="nav-inner">
+      <a routerLink="/" class="nav-logo" (click)="closeMenu()">
+        <img src="images/logos/logo-icon.png" alt="Meridian Travel" class="logo-img" />
+        <span class="logo-text">Meridian Travel</span>
+      </a>
+
+      <div class="nav-menu" [class.nav-menu--open]="menuOpen()" id="nav-menu">
+        <ul class="nav-links">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              routerLink="/"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeMenu()"
+            >Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/destinos" routerLinkActive="active" (click)="closeMenu()">Destinos</a>
+          </li>
+        </ul>
+
+        @if (auth.isAuthenticated()) {
+          <a class="nav-login" role="button" tabindex="0" (click)="cerrarSesion()" (keydown.enter)="cerrarSesion()">
+            Cerrar sesión
+          </a>
+        } @else {
+          <a routerLink="/login" class="nav-login" (click)="closeMenu()">Ingresar</a>
+        }
+      </div>
+
+      <button
+        class="hamburger"
+        [class.hamburger--open]="menuOpen()"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        [attr.aria-label]="menuOpen() ? 'Cerrar menú' : 'Abrir menú'"
+        aria-controls="nav-menu"
+        type="button"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div
+    class="menu-overlay"
+    [class.menu-overlay--visible]="menuOpen()"
+    (click)="closeMenu()"
+    aria-hidden="true"
+  ></div>
+</header>

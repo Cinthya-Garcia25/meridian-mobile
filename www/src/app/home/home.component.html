@@ -1,0 +1,120 @@
+<!-- ===== HERO SECTION ===== -->
+<section class="hero">
+  @for (slide of slides; track $index) {
+    <div
+      class="hero-bg"
+      [class]="'hero-bg--' + slide.theme"
+      [class.hero-bg--active]="activeSlide() === $index"
+    >
+      <img class="hero-bg-img" [src]="slide.image" alt="" aria-hidden="true" />
+    </div>
+  }
+
+  <div class="hero-overlay"></div>
+
+  <div class="particles">
+    @for (p of particles; track p) {
+      <span class="particle" [class]="'particle--' + p"></span>
+    }
+  </div>
+
+  <div class="hero-content">
+    @for (slide of slides; track $index) {
+      <div
+        class="slide-content"
+        [class.slide-content--active]="activeSlide() === $index && !isTransitioning()"
+        [class.slide-content--hidden]="activeSlide() !== $index"
+      >
+        <span class="slide-badge">{{ slide.badge }}</span>
+        <h1 class="slide-title">
+          <span class="title-white">{{ slide.titleWhite }}</span>
+          <span class="title-turquoise">{{ slide.titleTurquoise }}</span>
+        </h1>
+        <p class="slide-subtitle">{{ slide.subtitle }}</p>
+        <div class="slide-actions">
+          <button type="button" class="btn btn--primary" (click)="verDestinos()">
+            {{ slide.btnPrimary }}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <button type="button" class="btn btn--outline" (click)="verDestinos()">{{ slide.btnSecondary }}</button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <button class="hero-arrow hero-arrow--left" (click)="prevSlide()" aria-label="Anterior">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </button>
+  <button class="hero-arrow hero-arrow--right" (click)="nextSlide()" aria-label="Siguiente">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </button>
+
+  <div class="hero-dots">
+    @for (slide of slides; track $index) {
+      <button
+        class="dot"
+        [class.dot--active]="activeSlide() === $index"
+        (click)="goToSlide($index)"
+        [attr.aria-label]="'Slide ' + ($index + 1)"
+      ></button>
+    }
+  </div>
+</section>
+
+<!-- Stats bar -->
+<div class="hero-stats">
+  @for (stat of stats; track $index) {
+    <div class="stat-item">
+      <span class="stat-value">{{ stat.displayed() }}</span>
+      <span class="stat-label">{{ stat.label }}</span>
+    </div>
+    @if ($index < stats.length - 1) {
+      <div class="stat-divider"></div>
+    }
+  }
+</div>
+
+<!-- Destinos Populares -->
+<section class="tarjetas-dom-seccion" id="destinos" aria-labelledby="tarjetas-titulo">
+  <div class="seccion-inner">
+    <header class="seccion-header">
+      <p class="seccion-eyebrow">Tu próxima aventura te espera</p>
+      <h2 id="tarjetas-titulo" class="seccion-titulo">
+        Destinos <span class="titulo-acento">Populares</span>
+      </h2>
+      <p class="seccion-subtitulo">
+        Explora playas, ciudades y paisajes únicos alrededor del mundo
+      </p>
+    </header>
+
+    <div class="tarjetas-grid" role="list">
+      @for (destino of destinos; track destino.nombre; let i = $index) {
+        <article class="tarjeta" role="listitem" [style.animation-delay.ms]="i * 120">
+          <div class="tarjeta-imagen">
+            <span class="tarjeta-etiqueta">{{ destino.etiqueta }}</span>
+            <img class="tarjeta-imagen__img" [src]="destino.imagen" [alt]="'Vista de ' + destino.nombre" loading="lazy" />
+            <div class="tarjeta-imagen__overlay">
+              <span class="tarjeta-imagen__nombre">{{ destino.nombre }}</span>
+              <span class="tarjeta-imagen__pais">{{ destino.pais }}</span>
+            </div>
+          </div>
+          <div class="tarjeta-cuerpo">
+            <h3 class="tarjeta-titulo">{{ destino.nombre }}</h3>
+            <p class="tarjeta-descripcion">{{ destino.descripcion }}</p>
+            <div class="tarjeta-meta">
+              <span class="tarjeta-meta__item">{{ destino.temporada }}</span>
+              <span class="tarjeta-meta__precio">Desde ${{ destino.precioDesde.toLocaleString('es-MX') }} MXN</span>
+            </div>
+            <div class="tarjeta-acciones">
+              <button type="button" class="tarjeta-btn" (click)="verMas(destino)">Ver más</button>
+              <button type="button" class="tarjeta-btn tarjeta-btn--agendar" (click)="agendar(destino)">Agendar viaje</button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+    <p class="deslizar-pista">Desliza para ver más destinos →</p>
+  </div>
+</section>
+
+<app-volver-arriba />

@@ -1,0 +1,36 @@
+<div class="consulta-container">
+  <div class="consulta-card">
+    <div class="logo">
+      <span class="logo-letter">M</span>
+      <span class="logo-text">ConsultaWeb</span>
+    </div>
+    <h2>Consulta de información</h2>
+    <p class="url">{{ url }}</p>
+
+    <button class="btn" (click)="consultar()" [disabled]="cargando()">CONSULTAR</button>
+
+    @if (cargando()) {
+      <p class="cargando">Consultando...</p>
+    }
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    @if (campos().length) {
+      <div class="respuesta">
+        @if (total() > 1) {
+          <p class="total">Se recibieron {{ total() }} registros. Mostrando el primero:</p>
+        }
+        @for (campo of campos(); track campo.nombre) {
+          <div class="campo">
+            <span class="campo-nombre">{{ campo.nombre }}</span>
+            <span class="campo-valor">{{ campo.valor }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <a class="volver" routerLink="/home">Volver</a>
+  </div>
+</div>

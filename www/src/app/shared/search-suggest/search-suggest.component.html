@@ -1,0 +1,52 @@
+<div class="ss">
+  <div class="ss-field">
+    <svg class="ss-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+    <input
+      [id]="inputId()"
+      type="search"
+      class="ss-input"
+      [placeholder]="placeholder()"
+      [ngModel]="value()"
+      (ngModelChange)="onInput($event)"
+      (focus)="onFocus()"
+      (keydown)="onKeydown($event)"
+      autocomplete="off"
+      role="combobox"
+      [attr.aria-expanded]="abiertas() && sugerenciasVisibles().length > 0"
+      aria-autocomplete="list"
+      [attr.aria-controls]="inputId() + '-list'"
+    />
+
+    @if (abiertas() && sugerenciasVisibles().length > 0) {
+      <ul class="ss-list" [id]="inputId() + '-list'" role="listbox">
+        @for (item of sugerenciasVisibles(); track item.query + (item.sublabel || ''); let i = $index) {
+          <li
+            role="option"
+            class="ss-item"
+            [class.ss-item--active]="activo() === i"
+            [attr.aria-selected]="activo() === i"
+            (mousedown)="$event.preventDefault(); elegir(item)"
+            (mouseenter)="activo.set(i)"
+          >
+            <span class="ss-item__label">{{ item.label }}</span>
+            @if (item.sublabel) {
+              <span class="ss-item__sub">{{ item.sublabel }}</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  @if (showButton()) {
+    <button type="button" class="ss-btn" (click)="confirmar()">
+      {{ buttonLabel() }}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </button>
+  }
+</div>

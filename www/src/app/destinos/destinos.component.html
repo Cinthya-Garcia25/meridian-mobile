@@ -1,0 +1,281 @@
+<!-- ===== HERO HEADER ===== -->
+<section class="destinos-hero">
+  <div class="hero-glow" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Más de 80 destinos te esperan</p>
+    <h1 class="hero-title">
+      Explora el <span class="title-accent">Mundo</span>
+    </h1>
+    <p class="hero-subtitle">Descubre lugares que cambiarán tu forma de ver la vida</p>
+
+    <div class="search-bar">
+      <app-search-suggest
+        [value]="searchQuery()"
+        [items]="sugerenciasBusqueda()"
+        placeholder="Escribe un destino… ej. Tokio"
+        inputId="destinos-search"
+        (valueChange)="onSearchQuery($event)"
+        (search)="onSearch($event)"
+      />
+    </div>
+  </div>
+</section>
+
+<!-- ===== DESTINO DESTACADO ===== -->
+@if (destinoDestacado(); as destacado) {
+  <section class="seccion destacado-seccion">
+    <div class="seccion-inner">
+      <div class="destacado-card">
+        <!-- Imagen izquierda -->
+        <div class="destacado-img" [style.background-image]="fondo(destacado.imagen)">
+          @if (!destacado.imagen) {
+            <div class="destacado-img-overlay">
+              <span class="img-label">{{ destacado.nombre }}</span>
+            </div>
+          }
+          <div class="destacado-badge-img">
+            <span>{{ destacado.rating }}.0</span>
+            <span>{{ destacado.reviews | number }} reseñas</span>
+          </div>
+        </div>
+
+        <!-- Info derecha -->
+        <div class="destacado-info">
+          <span class="badge-mes">Destino del Mes</span>
+          <h2 class="destacado-nombre">{{ destacado.nombre }}</h2>
+          <p class="destacado-pais">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="pin-icon"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            {{ destacado.pais }}
+          </p>
+          <p class="destacado-desc">{{ destacado.descripcionLarga }}</p>
+
+          <div class="destacado-meta">
+            <div class="meta-item">
+              <div>
+                <span class="meta-label">Temperatura</span>
+                <span class="meta-val">{{ destacado.temperatura }}</span>
+              </div>
+            </div>
+            <div class="meta-item">
+              <div>
+                <span class="meta-label">Mejor época</span>
+                <span class="meta-val">{{ destacado.mejorEpoca }}</span>
+              </div>
+            </div>
+          </div>
+
+          <ul class="destacado-actividades">
+            @for (act of destacado.actividades; track act) {
+              <li>{{ act }}</li>
+            }
+          </ul>
+
+          <div class="destacado-footer">
+            <div class="precio-bloque">
+              <span class="desde">Desde</span>
+              <span class="precio">${{ formatPrecio(destacado.precioDesde) }} MXN</span>
+              <span class="por-persona">/ persona</span>
+            </div>
+            <div class="destacado-acciones">
+              <button class="btn-explorar btn-explorar--ghost" (click)="abrirModal(destacado)">
+                Explorar
+              </button>
+              <button class="btn-explorar" (click)="agendarDestino(destacado)">
+                Agendar viaje
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+<!-- ===== FILTROS ===== -->
+<section class="filtros-seccion">
+  <div class="seccion-inner">
+    <div class="filtros-bar">
+      @for (f of filtros; track f.key) {
+        <button
+          class="filtro-btn"
+          [class.filtro-btn--active]="filtroActivo() === f.key"
+          (click)="aplicarFiltro(f.key)"
+        >{{ f.label }}</button>
+      }
+    </div>
+    <p class="resultados-count">
+      {{ destinosFiltrados().length }} destino{{ destinosFiltrados().length !== 1 ? 's' : '' }} encontrado{{ destinosFiltrados().length !== 1 ? 's' : '' }}
+    </p>
+  </div>
+</section>
+
+<!-- ===== GRID DE DESTINOS ===== -->
+<section class="grid-seccion">
+  <div class="seccion-inner">
+    <div class="destinos-grid" [class.grid--visible]="cardsAnimadas()">
+      @if (cargando()) {
+        <div class="no-resultados"><p>Cargando destinos…</p></div>
+      } @else if (destinosFiltrados().length === 0) {
+        <div class="no-resultados">
+          <p>No encontramos destinos con "{{ searchQuery() }}"</p>
+          <button (click)="verTodos()">Ver todos</button>
+        </div>
+      }
+      @for (destino of destinosFiltrados(); track destino.id; let i = $index) {
+        <div
+          class="destino-card"
+          [class]="'destino-card--' + destino.categoria"
+          [style.animation-delay]="getCardDelay(i)"
+        >
+          <!-- Imagen / gradiente -->
+          <div class="card-img" [style.background-image]="fondo(destino.imagen)">
+            <span class="card-categoria-badge">{{ destino.categoria }}</span>
+            <div class="card-img-overlay">
+              <div class="overlay-actividades">
+                <p class="act-titulo">Actividades</p>
+                @for (act of destino.actividades.slice(0, 3); track act) {
+                  <span class="act-item">{{ act }}</span>
+                }
+              </div>
+              <div class="overlay-top">
+                <span class="card-nombre">{{ destino.nombre }}</span>
+                <span class="card-pais">{{ destino.pais }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info de la card -->
+          <div class="card-body">
+            <div class="card-rating">
+              <span class="stars">{{ estrellas(destino.rating) }}</span>
+              <span class="reviews-count">({{ destino.reviews | number }})</span>
+            </div>
+
+            <div class="card-meta-row">
+              <span class="card-temp">{{ destino.temperatura }}</span>
+              <span class="card-epoca">{{ destino.mejorEpoca }}</span>
+            </div>
+
+            <p class="card-desc">{{ destino.descripcion }}</p>
+
+            <div class="card-footer">
+              <div class="card-precio">
+                <span class="card-desde">Desde</span>
+                <span class="card-precio-val">${{ formatPrecio(destino.precioDesde) }}</span>
+                <span class="card-moneda">MXN</span>
+              </div>
+              <div class="card-acciones">
+                <button class="btn-ver-mas" (click)="abrirModal(destino)">
+                  Ver más
+                </button>
+                <button class="btn-agendar-card" (click)="agendarDestino(destino, $event)">
+                  Agendar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== BANNER INSPIRACIONAL ===== -->
+<section class="banner-inspiracion">
+  <div class="banner-inner">
+    <p class="banner-eyebrow">¿Listo para tu próxima aventura?</p>
+    <h2 class="banner-titulo">El mundo es demasiado grande<br>para quedarte en casa</h2>
+    <div class="banner-stats">
+      <div class="bstat">
+        <span class="bstat-num">{{ todosLosDestinos().length }}+</span>
+        <span class="bstat-label">Destinos disponibles</span>
+      </div>
+      <div class="bstat-divider"></div>
+      <div class="bstat">
+        <span class="bstat-num">10K+</span>
+        <span class="bstat-label">Viajeros felices</span>
+      </div>
+      <div class="bstat-divider"></div>
+      <div class="bstat">
+        <span class="bstat-num">100%</span>
+        <span class="bstat-label">Garantía de satisfacción</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MODAL ===== -->
+@if (modalVisible() && destinoSeleccionado(); as destinoSeleccionado) {
+  <div class="modal-overlay" [class.modal-overlay--visible]="modalAnimando()" (click)="cerrarModal()">
+    <div
+      class="modal"
+      [class]="'modal modal--' + destinoSeleccionado.categoria + (modalAnimando() ? ' modal--visible' : '')"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Imagen modal -->
+      <div class="modal-img" [style.background-image]="fondo(destinoSeleccionado.imagen)">
+        <div class="modal-img-overlay">
+          <h2 class="modal-nombre">{{ destinoSeleccionado.nombre }}</h2>
+          <p class="modal-pais">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="pin-icon"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            {{ destinoSeleccionado.pais }}
+          </p>
+        </div>
+        <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Contenido modal -->
+      <div class="modal-body">
+        <div class="modal-rating">
+          <span class="stars">{{ estrellas(destinoSeleccionado.rating) }}</span>
+          <span class="modal-reviews">({{ destinoSeleccionado.reviews | number }} reseñas)</span>
+        </div>
+
+        <p class="modal-desc">{{ destinoSeleccionado.descripcionLarga }}</p>
+
+        <div class="modal-meta">
+          <div class="modal-meta-item">
+            <div>
+              <span class="modal-meta-label">Temperatura promedio</span>
+              <span class="modal-meta-val">{{ destinoSeleccionado.temperatura }}</span>
+            </div>
+          </div>
+          <div class="modal-meta-item">
+            <div>
+              <span class="modal-meta-label">Mejor época</span>
+              <span class="modal-meta-val">{{ destinoSeleccionado.mejorEpoca }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actividades">
+          <h4>Actividades destacadas</h4>
+          <div class="actividades-grid">
+            @for (act of destinoSeleccionado.actividades; track act) {
+              <span class="actividad-chip">{{ act }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="modal-precio">
+            <span class="modal-desde">Precio desde</span>
+            <span class="modal-precio-val">${{ formatPrecio(destinoSeleccionado.precioDesde) }} <small>MXN / persona</small></span>
+          </div>
+          <div class="modal-acciones">
+            <button class="btn-paquetes" (click)="agendarDestino(destinoSeleccionado)">
+              Agendar viaje
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<app-volver-arriba />

@@ -1,0 +1,125 @@
+.consulta-container {
+  min-height: 100vh;
+  background-color: #0a1628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.consulta-card {
+  background-color: #0d1f38;
+  border-radius: 16px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 380px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.logo-letter {
+  color: #00d4ff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.logo-text {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+h2 {
+  color: #ffffff;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.url {
+  color: #8899aa;
+  font-size: 12px;
+  word-break: break-all;
+  margin-bottom: 24px;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  background-color: #00d4ff;
+  color: #0a1628;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cargando {
+  color: #00d4ff;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.error {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.respuesta {
+  margin-top: 20px;
+  padding: 16px;
+  background-color: #0a1628;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+}
+
+.total {
+  color: #8899aa;
+  font-size: 12px;
+  margin: 0 0 12px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.campo:last-child {
+  margin-bottom: 0;
+}
+
+.campo-nombre {
+  color: #00d4ff;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.campo-valor {
+  color: #ffffff;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.volver {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+  color: #00d4ff;
+  font-size: 14px;
+  text-decoration: none;
+}
