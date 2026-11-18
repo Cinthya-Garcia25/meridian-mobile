@@ -20,6 +20,15 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/destinos" routerLinkActive="active" (click)="closeMenu()">Destinos</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/mis-viajes" routerLinkActive="active" (click)="closeMenu()">Mis solicitudes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/favoritos" routerLinkActive="active" (click)="closeMenu()">Favoritos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/" fragment="contacto" (click)="closeMenu()">Contacto</a>
+          </li>
         </ul>
 
         @if (auth.isAuthenticated()) {

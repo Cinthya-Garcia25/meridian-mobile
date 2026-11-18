@@ -1,0 +1,159 @@
+/* ===== HERO ===== */
+.fav-hero {
+  background: linear-gradient(135deg, #0a1628 0%, #0d2040 100%);
+  padding: 100px 20px 40px;
+  text-align: center;
+}
+.fav-titulo {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.fav-subtitulo {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ===== SECCIÓN ===== */
+.fav-seccion {
+  padding: 24px 16px 80px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== EMPTY STATE ===== */
+.fav-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 20px;
+  gap: 12px;
+  color: #555;
+}
+.fav-empty-icon {
+  width: 64px;
+  height: 64px;
+  color: #ccc;
+}
+.fav-empty h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0a1628;
+  margin: 0;
+}
+.fav-empty p {
+  font-size: 0.9rem;
+  color: #777;
+  margin: 0;
+}
+.btn-explorar {
+  margin-top: 8px;
+  background: #00d4ff;
+  color: #0a1628;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ===== GRID ===== */
+.fav-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ===== CARD ===== */
+.fav-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.fav-card-img {
+  position: relative;
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  background-color: #0a1628;
+}
+.fav-categoria {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+.btn-quitar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 60, 80, 0.22);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-quitar:active { transform: scale(0.88); }
+.heart-icon {
+  width: 18px;
+  height: 18px;
+  color: #ff3c50;
+}
+.fav-card-body {
+  padding: 14px 16px 16px;
+}
+.fav-nombre {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0a1628;
+  margin: 0 0 2px;
+}
+.fav-pais {
+  font-size: 0.82rem;
+  color: #888;
+  margin: 0 0 8px;
+}
+.fav-desc {
+  font-size: 0.88rem;
+  color: #555;
+  margin: 0 0 12px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fav-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.fav-precio {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0a1628;
+}
+.fav-rating {
+  font-size: 0.85rem;
+  color: #f59e0b;
+  font-weight: 600;
+}

@@ -1,0 +1,63 @@
+<!-- HERO -->
+<section class="fav-hero">
+  <div class="fav-hero-inner">
+    <h1 class="fav-titulo">Mis Favoritos</h1>
+    <p class="fav-subtitulo">Los destinos que guardaste para tu próxima aventura</p>
+  </div>
+</section>
+
+<!-- CONTENIDO -->
+<section class="fav-seccion">
+  @if (favoritos.error(); as error) {
+    <p role="status">{{ error }}
+      @if (auth.enLinea()) {
+        <button type="button" (click)="favoritos.cargar()">Reintentar</button>
+      }
+    </p>
+  }
+  @if (favoritos.pendientes()) {
+    <p role="status">Tienes cambios guardados en este dispositivo que aún no se han sincronizado.</p>
+  }
+
+  @if (auth.sesionLista() && !favoritos.usuario()) {
+    <div class="fav-empty">
+      <p>Inicia sesión para ver tus favoritos.</p>
+      <a class="btn-explorar" routerLink="/login">Ingresar</a>
+    </div>
+  } @else if ((!auth.sesionLista() && !favoritos.usuario()) || (favoritos.cargando() && !favoritos.destinos().length && !favoritos.pendientes())) {
+    <div class="fav-empty">
+      <p>Cargando favoritos…</p>
+    </div>
+  } @else if (favoritos.destinos().length === 0) {
+    <div class="fav-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="fav-empty-icon">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+      <h3>Aún no tienes favoritos</h3>
+      <p>Explora el catálogo y guarda los destinos que más te gusten</p>
+      <a class="btn-explorar" routerLink="/destinos">Explorar destinos</a>
+    </div>
+  } @else {
+    <div class="fav-grid">
+      @for (destino of favoritos.destinos(); track destino.id) {
+        <div class="fav-card">
+          <div class="fav-card-img" [style.background-image]="fondo(destino.imagen)">
+            <span class="fav-categoria">{{ destino.categoria }}</span>
+            <button class="btn-quitar" (click)="favoritos.toggle(destino)" aria-label="Quitar de favoritos">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="heart-icon">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="fav-card-body">
+            <h3 class="fav-nombre">{{ destino.nombre }}</h3>
+            <p class="fav-pais">{{ destino.pais }}</p>
+            <div class="fav-footer">
+              <span class="fav-precio">Desde ${{ formatPrecio(destino.precio_desde) }} MXN</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>

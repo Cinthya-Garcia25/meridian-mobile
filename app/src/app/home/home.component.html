@@ -1,3 +1,4 @@
+@if (accesoCorrecto()) { <div class="aviso-acceso" role="status"><span><strong>Acceso exitoso</strong><br>Tu sesión se inició correctamente.</span><button type="button" (click)="cerrarAvisoAcceso()" aria-label="Cerrar aviso de acceso">×</button></div> }
 <!-- ===== HERO SECTION ===== -->
 <section class="hero">
   @for (slide of slides; track $index) {
@@ -107,7 +108,7 @@
             </div>
             <div class="tarjeta-acciones">
               <button type="button" class="tarjeta-btn" (click)="verMas(destino)">Ver más</button>
-              <button type="button" class="tarjeta-btn tarjeta-btn--agendar" (click)="agendar(destino)">Agendar viaje</button>
+              <button type="button" class="tarjeta-btn tarjeta-btn--agendar" (click)="agendar(destino)">Solicitar cotización</button>
             </div>
           </div>
         </article>
@@ -116,5 +117,7 @@
     <p class="deslizar-pista">Desliza para ver más destinos →</p>
   </div>
 </section>
+
+<app-contacto />
 
 <app-volver-arriba />

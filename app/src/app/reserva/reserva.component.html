@@ -1,0 +1,54 @@
+<section class="hero"><p class="eyebrow">Planea tu próxima historia</p><h1>Planea tu <span>viaje</span></h1><p>Primero tu destino. Después, tú eliges con quién compartirlo.</p></section>
+<main>
+  <a routerLink="/destinos" class="volver">← Volver a destinos</a>
+  <ol class="pasos" id="pasos-viaje" aria-label="Pasos para preparar el viaje">
+    <li [class.activo]="paso() === 1" [attr.aria-current]="paso() === 1 ? 'step' : null"><span>1</span>Tu viaje</li>
+    <li [class.activo]="paso() === 2" [attr.aria-current]="paso() === 2 ? 'step' : null"><span>2</span>Viajeros</li>
+    <li [class.activo]="paso() === 3" [attr.aria-current]="paso() === 3 ? 'step' : null"><span>3</span>Resumen</li>
+  </ol>
+  @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+  @if (paso() === 1) {
+    <section class="panel"><p class="eyebrow">Paso 1</p><h2>Datos de tu viaje</h2><p class="nota">Los campos con * son obligatorios.</p>
+      <form #form="ngForm" (ngSubmit)="continuar(form)">
+        <div class="grid">
+          <div><label for="viaje-destino">Destino *</label><input id="viaje-destino" name="destino" [(ngModel)]="datos.destino" required maxlength="120" placeholder="¿A dónde quieres ir?"></div>
+          <div><label for="viaje-origen">Ciudad de salida *</label><input id="viaje-origen" name="origen" [(ngModel)]="datos.origen" required maxlength="120" placeholder="Ej. Querétaro"></div>
+          <div><label for="viaje-salida">Fecha de salida *</label><input id="viaje-salida" name="salida" type="date" [(ngModel)]="datos.salida" [min]="hoy" required></div>
+          <div><label for="viaje-regreso">Fecha de regreso (opcional)</label><input id="viaje-regreso" name="regreso" type="date" [(ngModel)]="datos.regreso" [min]="datos.salida || hoy"></div>
+        </div>
+        <h3>Datos del viajero principal</h3>
+        <label for="viaje-nombre">Nombre completo *</label><input id="viaje-nombre" name="nombre" [(ngModel)]="datos.nombre" required maxlength="100" autocomplete="name">
+        <div class="grid"><div><label for="viaje-correo">Correo *</label><input id="viaje-correo" name="correo" type="email" email [(ngModel)]="datos.correo" required maxlength="254" autocomplete="email"></div><div><label for="viaje-telefono">Teléfono *</label><input id="viaje-telefono" name="telefono" type="tel" [(ngModel)]="datos.telefono" required pattern="[+0-9 ()-]{10,20}" maxlength="20" autocomplete="tel"></div></div>
+        <label for="viaje-comentarios">Comentarios (opcional)</label><textarea id="viaje-comentarios" name="comentarios" [(ngModel)]="datos.comentarios" maxlength="1000" rows="3" placeholder="Cuéntanos qué tienes en mente para tu viaje"></textarea>
+        <button type="submit" class="primario ancho">Continuar →</button>
+      </form>
+    </section>
+  }
+  @if (paso() === 2) {
+    <section class="panel"><p class="eyebrow">Paso 2 · {{ datos.destino }}</p><h2>¿Cómo vas a viajar?</h2><p class="nota">Agregar acompañantes es opcional. Si viajas solo, continúa directamente al resumen.</p>
+      <div class="opciones" role="radiogroup" aria-label="Tipo de viaje">
+        <label class="opcion" [class.elegida]="!conAcompanantes()"><input type="radio" name="tipo-viaje" [checked]="!conAcompanantes()" (change)="elegir(false)"><span><strong>Viajo solo</strong><small>Solo necesitas tus datos personales.</small></span></label>
+        <label class="opcion" [class.elegida]="conAcompanantes()"><input type="radio" name="tipo-viaje" [checked]="conAcompanantes()" (change)="elegir(true)"><span><strong>Agregar acompañantes</strong><small>Registra nuevos viajeros o elige de tu agenda.</small></span></label>
+      </div>
+    </section>
+    @if (conAcompanantes()) { <app-acompanantes [integrado]="true" [seleccionInicial]="acompanantes()" (seleccionChange)="acompanantes.set($event)" /> }
+    <div class="acciones"><button type="button" class="secundario" (click)="ir(1)">← Editar viaje</button><button type="button" class="primario" (click)="revisar()">Ver resumen →</button></div>
+  }
+  @if (paso() === 3) {
+    <section class="panel"><p class="eyebrow">Paso 3</p><h2>Resumen de tu solicitud</h2><span class="badge">{{ conAcompanantes() ? 'Viaje con acompañantes' : 'Viaje individual' }}</span>
+      <dl><div><dt>Destino</dt><dd>{{ datos.destino }}</dd></div><div><dt>Ciudad de salida</dt><dd>{{ datos.origen }}</dd></div><div><dt>Salida</dt><dd>{{ fecha(datos.salida) }}</dd></div><div><dt>Regreso</dt><dd>{{ fecha(datos.regreso) }}</dd></div><div><dt>Viajero principal</dt><dd>{{ datos.nombre }}</dd></div><div><dt>Contacto</dt><dd>{{ datos.correo }}<br>{{ datos.telefono }}</dd></div></dl>
+      @if (datos.comentarios) { <h3>Comentarios</h3><p class="nota">{{ datos.comentarios }}</p> }
+      @if (conAcompanantes()) { <h3>Acompañantes ({{ acompanantes().length }})</h3><ul class="viajeros">@for (usuario of acompanantes(); track usuario.id) { <li><strong>{{ usuario.nombre }}</strong><span>{{ usuario.edad }} años</span></li> }</ul> }
+      @else { <p class="nota">Solicitud para un viajero. No se requiere registrar acompañantes.</p> }
+      @if (guardadoId()) {
+        <div class="guardado" role="status"><h3>¡Solicitud de cotización enviada!</h3><p>Tu solicitud fue enviada con folio #{{ guardadoId() }}. Un asesor revisará los datos y responderá con una propuesta. Esto aún no confirma una reserva.</p><a routerLink="/mis-viajes" class="enlace-viajes">Ver en Mis solicitudes →</a></div>
+      } @else {
+        <p class="pendiente">Al enviar, registrarás una solicitud de cotización con los datos del viaje y los acompañantes seleccionados. Quedará pendiente de revisión por un asesor. El envío no garantiza disponibilidad, no fija un precio y no confirma una reserva. No se realiza ningún pago.</p>
+        @if (enviando()) { <p class="envio-estado" role="status"><span class="spinner" aria-hidden="true"></span>Guardando tu solicitud...</p> }
+        @if (reintentoPendiente()) { <p class="nota">El resultado del último envío está pendiente. Reintenta antes de cambiar los datos.</p> }
+        <button type="button" class="primario ancho" [disabled]="enviando()" (click)="enviar()">{{ enviando() ? 'Enviando...' : reintentoPendiente() ? 'Reintentar envío' : 'Enviar solicitud de cotización' }}</button>
+        <div class="acciones"><button type="button" class="secundario" [disabled]="enviando() || reintentoPendiente()" (click)="ir(1)">Editar viaje</button><button type="button" class="secundario" [disabled]="enviando() || reintentoPendiente()" (click)="ir(2)">Cambiar viajeros</button></div>
+      }
+    </section>
+  }
+</main>

@@ -1,0 +1,48 @@
+name: Pruebas móviles
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: meridian_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: meridian_test
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd="pg_isready -U postgres -d meridian_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Instalar dependencias
+        working-directory: app
+        run: npm ci --no-audit --no-fund
+      - name: Ejecutar la suite Angular
+        working-directory: app
+        run: time npm test -- --watch=false
+      - name: Verificar persistencia PostgreSQL
+        env:
+          PGHOST: localhost
+          PGPORT: ${{ job.services.postgres.ports[5432] }}
+          PGUSER: postgres
+          PGPASSWORD: meridian_test
+          PGDATABASE: meridian_test
+        run: time bash practica13-14/verificar-persistencia.sh

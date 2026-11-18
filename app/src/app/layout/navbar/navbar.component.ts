@@ -1,5 +1,6 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { NotificacionesService } from '../../notificaciones/notificaciones.service';
 import { SupabaseService } from '../../supabase.service';
 
 // Mismo navbar que la web (meridian-travel/frontend/src/app/shared/navbar) en su
@@ -14,6 +15,7 @@ import { SupabaseService } from '../../supabase.service';
 })
 export class NavbarComponent {
   private router = inject(Router);
+  private readonly notificaciones = inject(NotificacionesService);
   readonly auth = inject(SupabaseService);
 
   navScrolled = signal(false);
@@ -40,7 +42,13 @@ export class NavbarComponent {
     this.syncBodyScroll();
   }
 
+  irAFavoritos() {
+    this.closeMenu();
+    this.router.navigate(['/destinos'], { queryParams: { categoria: 'favoritos' } });
+  }
+
   async cerrarSesion() {
+    await this.notificaciones.desactivar();
     await this.auth.signOut();
     this.closeMenu();
     this.router.navigateByUrl('/');

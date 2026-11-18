@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-// Mismo footer que la web (meridian-travel/frontend/src/app/shared/footer), sin la
-// columna de navegación ni los enlaces legales: esas páginas no existen en la app.
+// El contacto se consulta desde Inicio; el footer conserva la marca y la navegación.
 @Component({
   selector: 'app-footer',
   standalone: true,

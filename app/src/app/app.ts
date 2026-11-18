@@ -3,6 +3,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { NavbarComponent } from './layout/navbar/navbar.component';
+import { NotificacionesService } from './notificaciones/notificaciones.service';
+import { FavoritosService } from './favoritos.service';
 import { FooterComponent } from './layout/footer/footer.component';
 
 @Component({
@@ -14,6 +16,11 @@ import { FooterComponent } from './layout/footer/footer.component';
 export class App {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  constructor() {
+    inject(FavoritosService);
+    inject(NotificacionesService);
+  }
 
   // Las rutas con data.hideChrome (login) se muestran sin navbar ni footer, como en la web.
   protected readonly ocultarChrome = toSignal(

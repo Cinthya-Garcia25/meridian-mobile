@@ -4,6 +4,8 @@ import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { coincideBusqueda, normalizarBusqueda } from '../core/busqueda';
 import { SupabaseService } from '../supabase.service';
+import { FavoritosService } from '../favoritos.service';
+import { ClimaComponent } from './clima/clima.component';
 import { CatalogoService, Destino } from './catalogo.service';
 import { SearchSuggestComponent, SearchSuggestItem } from '../shared/search-suggest/search-suggest.component';
 import { VolverArribaComponent } from '../shared/volver-arriba/volver-arriba.component';
@@ -12,7 +14,7 @@ import { VolverArribaComponent } from '../shared/volver-arriba/volver-arriba.com
 @Component({
   selector: 'app-destinos',
   standalone: true,
-  imports: [DecimalPipe, SearchSuggestComponent, VolverArribaComponent],
+  imports: [ClimaComponent, DecimalPipe, SearchSuggestComponent, VolverArribaComponent],
   templateUrl: './destinos.component.html',
   styleUrls: ['./destinos.component.css']
 })
@@ -20,6 +22,7 @@ export class DestinosComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private auth = inject(SupabaseService);
+  readonly favoritos = inject(FavoritosService);
   private destroyRef = inject(DestroyRef);
   private catalogoService = inject(CatalogoService);
 
@@ -31,13 +34,22 @@ export class DestinosComponent implements OnInit {
   readonly modalVisible = signal(false);
   readonly modalAnimando = signal(false);
   readonly cardsAnimadas = signal(false);
+  // Cordova deriva los enlaces HTTPS externos a Android mediante allow-intent.
+  // En el navegador abrimos otra pestaña para conservar el catálogo.
+  readonly destinoMapaTarget = 'cordova' in window ? '_self' : '_blank';
+
+  ubicacionUrl(destino: Destino): string {
+    const lugar = [destino.nombre.trim(), destino.pais?.trim()].filter(Boolean).join(', ');
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lugar)}`;
+  }
 
   filtros = [
-    { key: 'todos',    label: 'Todos'    },
-    { key: 'playa',    label: 'Playa'    },
-    { key: 'montaña',  label: 'Montaña'  },
-    { key: 'ciudad',   label: 'Ciudad'   },
-    { key: 'aventura', label: 'Aventura' },
+    { key: 'todos',     label: 'Todos'     },
+    { key: 'playa',     label: 'Playa'     },
+    { key: 'montaña',   label: 'Montaña'   },
+    { key: 'ciudad',    label: 'Ciudad'    },
+    { key: 'aventura',  label: 'Aventura'  },
+    { key: 'favoritos', label: 'Favoritos' },
   ];
 
   readonly cargando = signal(true);
@@ -45,7 +57,19 @@ export class DestinosComponent implements OnInit {
   readonly destinoDestacado = computed<Destino | null>(
     () => this.todosLosDestinos().find((d) => d.destacado) ?? this.todosLosDestinos()[0] ?? null
   );
-  readonly destinosFiltrados = signal<Destino[]>([]);
+  readonly destinosFiltrados = computed<Destino[]>(() => {
+    this.favoritos.ids();
+    const f = this.filtroActivo();
+    let lista: Destino[];
+    if (f === 'todos') {
+      lista = this.todosLosDestinos();
+    } else if (f === 'favoritos') {
+      lista = this.todosLosDestinos().filter((d) => this.favoritos.esFavorito(d.id));
+    } else {
+      lista = this.todosLosDestinos().filter((d) => d.categoria === f);
+    }
+    return this.buscar(lista);
+  });
 
   readonly sugerenciasBusqueda = computed<SearchSuggestItem[]>(() =>
     this.todosLosDestinos().map((d) => ({ label: d.nombre, sublabel: d.pais ?? undefined, query: d.nombre }))
@@ -69,6 +93,7 @@ export class DestinosComponent implements OnInit {
     });
 
     setTimeout(() => this.cardsAnimadas.set(true), 100);
+    void this.favoritos.cargar();
   }
 
   private aplicarQueryParams(params: ParamMap): void {
@@ -76,9 +101,12 @@ export class DestinosComponent implements OnInit {
     const categoria = params.get('categoria');
     if (q) this.searchQuery.set(q);
     if (categoria && this.filtros.some((f) => f.key === categoria)) {
+      if (categoria === 'favoritos' && !this.favoritos.usuario()) {
+        this.router.navigate(['/login']);
+        return;
+      }
       this.filtroActivo.set(categoria);
     }
-    this.destinosFiltrados.set(this.buscar(this.porCategoria()));
     if (categoria) {
       setTimeout(() => document.querySelector('.filtros-bar')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
     }
@@ -89,6 +117,10 @@ export class DestinosComponent implements OnInit {
   }
 
   aplicarFiltro(filtro: string) {
+    if (filtro === 'favoritos' && !this.favoritos.usuario()) {
+      this.router.navigate(['/login']);
+      return;
+    }
     this.filtroActivo.set(filtro);
     this.refrescarLista(true);
   }
@@ -109,14 +141,14 @@ export class DestinosComponent implements OnInit {
   }
 
   private porCategoria(): Destino[] {
-    return this.filtroActivo() === 'todos'
-      ? this.todosLosDestinos()
-      : this.todosLosDestinos().filter((d) => d.categoria === this.filtroActivo());
+    const f = this.filtroActivo();
+    if (f === 'todos') return this.todosLosDestinos();
+    if (f === 'favoritos') return this.todosLosDestinos().filter((d) => this.favoritos.esFavorito(d.id));
+    return this.todosLosDestinos().filter((d) => d.categoria === f);
   }
 
   private refrescarLista(scrollAResultados: boolean) {
     this.cardsAnimadas.set(false);
-    this.destinosFiltrados.set(this.buscar(this.porCategoria()));
     queueMicrotask(() => this.cardsAnimadas.set(true));
     if (scrollAResultados && this.searchQuery().trim()) {
       queueMicrotask(() =>
@@ -154,16 +186,15 @@ export class DestinosComponent implements OnInit {
     }, 300);
   }
 
-  // Igual que la web: agendar requiere sesión. La app todavía no tiene la pantalla
-  // de cotizar, así que con sesión solo se avisa.
+  // Inicia una solicitud de cotización para el destino elegido.
   agendarDestino(destino: Destino, event?: Event) {
     event?.stopPropagation();
     if (this.modalVisible()) this.cerrarModal();
     if (!this.auth.isAuthenticated()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], { queryParams: { destinoReserva: destino.nombre } });
       return;
     }
-    alert(`La cotización de ${destino.nombre} desde la app estará disponible próximamente.`);
+    this.router.navigate(['/reservar'], { queryParams: { destino: destino.nombre } });
   }
 
   @HostListener('document:keydown.escape')
@@ -181,5 +212,18 @@ export class DestinosComponent implements OnInit {
 
   fondo(imagen: string | null): string | null {
     return imagen ? `url(${imagen})` : null;
+  }
+
+  esFavorito(id: number): boolean {
+    return this.favoritos.esFavorito(id);
+  }
+
+  toggleFavorito(destino: Destino, event?: Event) {
+    event?.stopPropagation();
+    if (!this.favoritos.usuario()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.favoritos.toggle(destino);
   }
 }

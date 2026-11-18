@@ -12,5 +12,10 @@
   </head>
   <body>
     <app-root></app-root>
+    <script>
+      if (location.protocol === 'file:' || location.hostname === 'localhost' && !location.port) {
+        document.write('<script src="cordova.js"><\/script>');
+      }
+    </script>
   </body>
 </html>

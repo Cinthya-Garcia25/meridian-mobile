@@ -82,7 +82,7 @@
                 Explorar
               </button>
               <button class="btn-explorar" (click)="agendarDestino(destacado)">
-                Agendar viaje
+                Solicitar cotización
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
             </div>
@@ -111,6 +111,10 @@
   </div>
 </section>
 
+@if (favoritos.error(); as error) {
+  <p class="favoritos-aviso" role="status">{{ error }}</p>
+}
+
 <!-- ===== GRID DE DESTINOS ===== -->
 <section class="grid-seccion">
   <div class="seccion-inner">
@@ -132,6 +136,9 @@
           <!-- Imagen / gradiente -->
           <div class="card-img" [style.background-image]="fondo(destino.imagen)">
             <span class="card-categoria-badge">{{ destino.categoria }}</span>
+            <button class="btn-favorito" [class.btn-favorito--activo]="esFavorito(destino.id)" (click)="toggleFavorito(destino, $event)" [attr.aria-pressed]="esFavorito(destino.id)" [attr.aria-label]="esFavorito(destino.id) ? 'Quitar de favoritos' : 'Guardar en favoritos'">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="heart-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </button>
             <div class="card-img-overlay">
               <div class="overlay-actividades">
                 <p class="act-titulo">Actividades</p>
@@ -171,7 +178,7 @@
                   Ver más
                 </button>
                 <button class="btn-agendar-card" (click)="agendarDestino(destino, $event)">
-                  Agendar
+                  Solicitar cotización
                 </button>
               </div>
             </div>
@@ -252,6 +259,8 @@
           </div>
         </div>
 
+        <app-clima-destino [destino]="destinoSeleccionado" />
+
         <div class="modal-actividades">
           <h4>Actividades destacadas</h4>
           <div class="actividades-grid">
@@ -267,8 +276,16 @@
             <span class="modal-precio-val">${{ formatPrecio(destinoSeleccionado.precioDesde) }} <small>MXN / persona</small></span>
           </div>
           <div class="modal-acciones">
+            <a class="btn-paquetes btn-paquetes--ghost"
+              [href]="ubicacionUrl(destinoSeleccionado)"
+              [attr.target]="destinoMapaTarget"
+              rel="noopener noreferrer"
+              [attr.aria-label]="'Ver ubicación de ' + destinoSeleccionado.nombre + ' en Google Maps'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              Ver ubicación
+            </a>
             <button class="btn-paquetes" (click)="agendarDestino(destinoSeleccionado)">
-              Agendar viaje
+              Solicitar cotización
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>

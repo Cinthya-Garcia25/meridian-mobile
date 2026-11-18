@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../supabase.service';
+import { ContactoComponent } from '../contacto/contacto.component';
 import { VolverArribaComponent } from '../shared/volver-arriba/volver-arriba.component';
 
 // Mismo home que la web (meridian-travel/frontend/src/app/pages/home y
@@ -38,13 +39,16 @@ interface Destino {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [VolverArribaComponent],
+  imports: [VolverArribaComponent, ContactoComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private auth = inject(SupabaseService);
+
+  readonly accesoCorrecto = signal(history.state?.accesoCorrecto === true);
+  cerrarAvisoAcceso(): void { this.accesoCorrecto.set(false); }
 
   activeSlide = signal(0);
   isTransitioning = signal(false);
@@ -207,13 +211,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     alert(`${destino.nombre}\n\n${destino.descripcionLarga}`);
   }
 
-  // Igual que la web: agendar requiere sesión. La app todavía no tiene la pantalla
-  // de cotizar, así que con sesión solo se avisa.
+  // Inicia una solicitud de cotización para el destino elegido.
   agendar(destino: Destino) {
     if (!this.auth.isAuthenticated()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], { queryParams: { destinoReserva: destino.nombre } });
       return;
     }
-    alert(`La cotización de ${destino.nombre} desde la app estará disponible próximamente.`);
+    this.router.navigate(['/reservar'], { queryParams: { destino: destino.nombre } });
   }
 }

@@ -32,9 +32,13 @@ export class CatalogoService {
   // Pide el catálogo a la API de la web. Si no responde (el servidor gratuito de
   // Render se apaga cuando no se usa) o falla, usa la copia local del catálogo.
   destinos(): Observable<Destino[]> {
-    return this.http.get<Destino[]>(`${API_URL}/destinos`).pipe(
-      timeout(8000),
-      catchError(() => of(DESTINOS_LOCALES)),
+    const catalogo = navigator.onLine
+      ? this.http.get<Destino[]>(`${API_URL}/destinos`).pipe(
+        timeout(8000),
+        catchError(() => of(DESTINOS_LOCALES)),
+      )
+      : of(DESTINOS_LOCALES);
+    return catalogo.pipe(
       map((lista) =>
         lista
           .filter((d) => d.activo)

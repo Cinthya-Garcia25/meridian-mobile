@@ -1,17 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SupabaseService } from '../supabase.service';
 
-// Mismos mensajes y reglas que la app web (meridian-travel/frontend/src/app/core/services/auth.service.ts
-// y core/validation.ts).
-const ERRORES: Record<string, string> = {
-  'Invalid login credentials': 'Correo o contraseña incorrectos.',
-  'User already registered': 'Ya existe una cuenta con ese correo.',
-  'Email not confirmed': 'Confirma tu correo antes de iniciar sesión (revisa tu bandeja de entrada).',
-  'Password should be at least 6 characters.': 'La contraseña debe tener al menos 6 caracteres.',
-  'email rate limit exceeded': 'Se enviaron demasiados correos en poco tiempo. Espera unos minutos e intenta de nuevo.',
-};
+import { LIMITE_CORREO, MIN_PASSWORD, MAX_PASSWORD } from '../auth-validation';
+
+const ERROR_ACCESO = 'No fue posible iniciar sesión. Verifica tus datos e inténtalo de nuevo.';
+const ERROR_REGISTRO = 'No fue posible completar el registro. Revisa tus datos o inténtalo más tarde.';
+const sinEspacios: ValidatorFn = control => typeof control.value === 'string' && !control.value.trim() ? { required: true } : null;
 
 const LIMITE_NOMBRE = 100;
 
@@ -37,8 +33,12 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private supabase = inject(SupabaseService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   readonly limiteNombre = LIMITE_NOMBRE;
+  readonly limiteCorreo = LIMITE_CORREO;
+  readonly minimoPassword = MIN_PASSWORD;
+  readonly maximoPassword = MAX_PASSWORD;
 
   // signal() porque esta app corre sin zone.js: los cambios después del await
   // no actualizarían la pantalla con propiedades normales.
@@ -51,16 +51,16 @@ export class LoginComponent {
   mostrarPasswordSignup = signal(false);
 
   loginForm = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
+    email: ['', [Validators.required, sinEspacios, Validators.email, Validators.maxLength(LIMITE_CORREO)]],
+    password: ['', [Validators.required, sinEspacios, Validators.minLength(MIN_PASSWORD), Validators.maxLength(MAX_PASSWORD)]],
   });
 
   signupForm = this.fb.nonNullable.group({
-    nombre: ['', [Validators.required, Validators.maxLength(LIMITE_NOMBRE)]],
-    apellidos: ['', [Validators.required, Validators.maxLength(LIMITE_NOMBRE)]],
-    email: ['', [Validators.required, Validators.email]],
+    nombre: ['', [Validators.required, sinEspacios, Validators.maxLength(LIMITE_NOMBRE)]],
+    apellidos: ['', [Validators.required, sinEspacios, Validators.maxLength(LIMITE_NOMBRE)]],
+    email: ['', [Validators.required, sinEspacios, Validators.email, Validators.maxLength(LIMITE_CORREO)]],
     telefono: ['', [Validators.required, telefonoValidator()]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required, sinEspacios, Validators.minLength(MIN_PASSWORD), Validators.maxLength(MAX_PASSWORD)]],
     aceptaTerminos: [false, Validators.requiredTrue],
   });
 
@@ -73,6 +73,10 @@ export class LoginComponent {
     this.errorMensaje.set(null);
     this.mensajeExito.set(null);
     this.revisarCorreo.set(false);
+    this.loginForm.controls.password.reset('');
+    this.signupForm.controls.password.reset('');
+    this.mostrarPasswordLogin.set(false);
+    this.mostrarPasswordSignup.set(false);
   }
 
   get loginEmailInvalido(): boolean {
@@ -88,7 +92,7 @@ export class LoginComponent {
   }
 
   get loginPasswordMensaje(): string {
-    return 'Este campo es obligatorio';
+    return this.mensajePassword(this.loginForm.controls.password);
   }
 
   get signupNombreInvalido(): boolean {
@@ -138,63 +142,63 @@ export class LoginComponent {
   }
 
   get signupPasswordMensaje(): string {
-    return this.signupForm.controls.password.errors?.['required']
-      ? 'Este campo es obligatorio'
-      : 'Debe tener al menos 6 caracteres';
+    return this.mensajePassword(this.signupForm.controls.password);
   }
 
   async login() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
-    }
+    if (this.enviando()) return;
+    this.errorMensaje.set(null); this.mensajeExito.set(null);
+    const correo = this.loginForm.controls.email.value;
+    // Solo se recorta el correo válido en longitud; la contraseña se envía intacta.
+    if (correo.length <= LIMITE_CORREO) this.loginForm.controls.email.setValue(correo.trim());
+    if (this.loginForm.invalid) { this.loginForm.markAllAsTouched(); return; }
     const { email, password } = this.loginForm.getRawValue();
-    this.errorMensaje.set(null);
-    this.mensajeExito.set(null);
     this.enviando.set(true);
-
-    const { error } = await this.supabase.signIn(email, password);
-    this.enviando.set(false);
-
-    if (error) {
-      this.errorMensaje.set(ERRORES[error.message] ?? error.message);
-      return;
+    try {
+      const { error } = await this.supabase.signIn(email, password);
+      if (error) { this.errorMensaje.set(ERROR_ACCESO); return; }
+      const chatViaje = this.route.snapshot.queryParamMap.get('chatViaje');
+      if (chatViaje && /^[1-9]\d*$/.test(chatViaje)) { await this.router.navigate(['/chat', chatViaje]); return; }
+      const destino = this.route.snapshot.queryParamMap.get('destinoReserva');
+      await this.router.navigate(destino ? ['/reservar'] : ['/'], {
+        queryParams: destino ? { destino } : undefined,
+        state: { accesoCorrecto: true },
+      });
+    } catch { this.errorMensaje.set(ERROR_ACCESO); }
+    finally {
+      this.loginForm.controls.password.reset('');
+      this.mostrarPasswordLogin.set(false);
+      this.enviando.set(false);
     }
-    this.router.navigate(['/']);
   }
 
   async registrar() {
-    if (this.signupForm.invalid) {
-      this.signupForm.markAllAsTouched();
-      return;
-    }
+    if (this.enviando()) return;
+    this.errorMensaje.set(null); this.mensajeExito.set(null);
+    if (this.signupForm.invalid) { this.signupForm.markAllAsTouched(); return; }
     const { nombre, apellidos, email, telefono, password } = this.signupForm.getRawValue();
-    this.errorMensaje.set(null);
     this.enviando.set(true);
-
-    const { data, error } = await this.supabase.signUp(email, password, { nombre, apellidos, telefono });
-
-    if (error) {
+    try {
+      const { data, error } = await this.supabase.signUp(email.trim(), password, { nombre: nombre.trim(), apellidos: apellidos.trim(), telefono });
+      if (error) { this.errorMensaje.set(ERROR_REGISTRO); return; }
+      if (!data.session) { this.revisarCorreo.set(true); return; }
+      await this.supabase.signOut();
+      this.signupForm.reset();
+      this.loginForm.patchValue({ email: email.trim() });
+      this.mensajeExito.set('Solicitud de registro procesada. Inicia sesión o revisa tu correo para continuar.');
+      this.modo.set('login');
+    } catch { this.errorMensaje.set(ERROR_REGISTRO); }
+    finally {
+      this.signupForm.controls.password.reset('');
+      this.mostrarPasswordSignup.set(false);
       this.enviando.set(false);
-      this.errorMensaje.set(ERRORES[error.message] ?? error.message);
-      return;
     }
+  }
 
-    // El proyecto tiene "Confirm email" activado: no hay sesión hasta que el usuario confirme.
-    if (!data.session) {
-      this.enviando.set(false);
-      this.revisarCorreo.set(true);
-      return;
-    }
-
-    // Igual que la web: no se entra directo, se cierra la sesión que deja el registro
-    // y se manda al login con el correo precargado.
-    await this.supabase.signOut();
-    this.enviando.set(false);
-    this.signupForm.reset();
-    this.loginForm.patchValue({ email });
-    this.mensajeExito.set('Tu cuenta se creó correctamente. Inicia sesión para continuar.');
-    this.modo.set('login');
+  private mensajePassword(control: AbstractControl): string {
+    if (control.errors?.['required']) return 'Este campo es obligatorio';
+    if (control.errors?.['maxlength']) return `Máximo ${MAX_PASSWORD} caracteres`;
+    return `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres`;
   }
 
   private invalidoYTocado(control: AbstractControl): boolean {
@@ -202,6 +206,8 @@ export class LoginComponent {
   }
 
   private mensajeEmail(control: AbstractControl): string {
-    return control.errors?.['required'] ? 'Este campo es obligatorio' : 'Ingresa un correo válido';
+    if (control.errors?.['required']) return 'Este campo es obligatorio';
+    if (control.errors?.['maxlength']) return `Máximo ${LIMITE_CORREO} caracteres`;
+    return 'Ingresa un correo válido';
   }
 }

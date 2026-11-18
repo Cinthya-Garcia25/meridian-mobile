@@ -1,0 +1,57 @@
+<section id="contacto" class="contacto" aria-labelledby="contacto-titulo">
+  <div class="contacto-inner">
+    <header class="contacto-header">
+      <div class="orbita" aria-hidden="true"><span></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m22 2-7 20-4-9-9-4L22 2ZM22 2 11 13"/></svg>
+      </div>
+      <p class="eyebrow">Cerca de ti, en cada destino</p>
+      <h2 id="contacto-titulo">Tu próxima historia<br>empieza con <span>un hola.</span></h2>
+      <p class="intro">Grandes viajes comienzan con una conversación. Encuentra aquí cómo conectar con Meridian Travel.</p>
+      <div class="header-firma"><span class="firma-linea"></span> CONTACTO MERIDIAN <span class="firma-linea"></span></div>
+    </header>
+    <div class="panel">
+      <div class="panel-cabecera">
+        <span class="panel-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-3 3V11.5a10 10 0 0 1 20 0Z"/><path d="M7 10h8M7 14h5"/></svg></span>
+        <div><p class="panel-etiqueta">Hablemos de tu viaje</p><h3>Consulta de información</h3></div>
+      </div>
+      <button type="button" (click)="consultar()" [disabled]="cargando()"
+        aria-label="Consultar información" aria-controls="contacto-respuesta">
+        <span>CONSULTAR</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+      </button>
+      <div id="contacto-respuesta" class="respuesta" aria-live="polite" [attr.aria-busy]="cargando()">
+        @if (cargando()) {
+          <div class="estado estado-carga" role="status"><span class="spinner" aria-hidden="true"></span><p>Consultando...</p><span class="estado-sub">Un momento, estamos buscando nuestros datos.</span></div>
+        } @else if (error()) {
+          <div class="estado estado-error"><span class="estado-simbolo" aria-hidden="true">!</span><p role="alert">No fue posible obtener la información.</p><span class="estado-sub">Comprueba tu conexión y vuelve a consultar.</span></div>
+        } @else if (consultado()) {
+          @for (contacto of contactos(); track $index) {
+            <article class="tarjeta-contacto">
+              <div class="agencia"><img src="images/logos/logo-icon.png" alt="" width="46" height="46"><div><span class="agencia-etiqueta">Tu conexión con el mundo</span><h4>{{ contacto.nombre || 'Meridian Travel' }}</h4></div></div>
+              @if (contacto.descripcion) { <p class="descripcion">{{ contacto.descripcion }}</p> }
+              <dl>
+                @if (contacto.telefono) {
+                  <div class="dato"><span class="dato-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.7L7.7 9.7a16 16 0 0 0 6.6 6.6l1.3-1.3a2 2 0 0 1 1.7-.6l3 .5a2 2 0 0 1 1.7 2Z"/></svg></span><div><dt>Llámanos</dt><dd>{{ contacto.telefono }}</dd></div></div>
+                }
+                @if (contacto.correo) {
+                  <div class="dato"><span class="dato-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 6 9 7 9-7"/></svg></span><div><dt>Escríbenos</dt><dd>{{ contacto.correo }}</dd></div></div>
+                }
+                @if (contacto.direccion) {
+                  <div class="dato"><span class="dato-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><div><dt>Visítanos</dt><dd>{{ contacto.direccion }}</dd></div></div>
+                }
+                @if (contacto.horario) {
+                  <div class="dato"><span class="dato-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><dt>Horario de atención</dt><dd>{{ contacto.horario }}</dd></div></div>
+                }
+              </dl>
+            </article>
+          } @empty {
+            <div class="estado"><p>Aún no hay información de contacto disponible.</p><span class="estado-sub">Puedes volver a consultar más adelante.</span></div>
+          }
+        } @else {
+          <div class="estado estado-inicial"><span class="estado-simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4zM8 9h8M8 13h5"/><path d="m16 17 2 2 4-4"/></svg></span><p>Estamos a una consulta de distancia</p><span class="estado-sub">Presiona CONSULTAR para ver nuestro teléfono, correo, dirección y horario.</span></div>
+        }
+      </div>
+      <p class="panel-pie">Cada vuelo, una historia. La tuya comienza aquí.</p>
+    </div>
+  </div>
+</section>

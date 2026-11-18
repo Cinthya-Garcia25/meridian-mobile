@@ -1,0 +1,28 @@
+<div class="chat">
+  <header class="cabecera"><a routerLink="/mis-viajes" aria-label="Volver a Mis solicitudes" class="volver">←</a><img src="images/logos/logo-icon.png" alt="" width="38" height="38"><div><p class="eyebrow">Conversación Meridian</p><h1>{{ sala()?.destino || 'Tu viaje' }}</h1></div></header>
+  @if (sala(); as chat) {
+    <section class="participantes" aria-label="Participantes de la conversación">
+      <div><span class="avatar">A</span><p><small>Viajero · Dispositivo A</small><strong>{{ chat.viajeroNombre }}</strong><span>{{ chat.contadorViajero }} mensajes enviados</span></p></div>
+      <div><span class="avatar asesor">B</span><p><small>Asesor · Dispositivo B</small><strong>{{ chat.asesorNombre }}</strong><span>{{ chat.contadorAsesor }} mensajes enviados</span></p></div>
+    </section>
+    <div class="herramientas"><span class="conexion" [class.online]="conectado()"><i></i>{{ conectado() ? 'En tiempo real' : 'Conectando · actualización cada 30 s' }}</span><button type="button" (click)="refrescar()">Actualizar</button><button type="button" [disabled]="enviando() || limpiando() || incierto()" (click)="confirmarLimpiar()">Limpiar historial</button></div>
+  }
+  @if (error()) { <div class="error" role="alert">{{ error() }} <button type="button" (click)="refrescar()">Reintentar</button></div> }
+  @if (aviso()) { <p class="aviso" role="status">{{ aviso() }}</p> }
+  <section #lista class="mensajes" aria-label="Conversación" aria-live="polite" aria-relevant="additions">
+    @if (cargando()) { <div class="vacio" role="status"><span class="spinner"></span><p>Conectando con tu conversación...</p></div> }
+    @else if (sala(); as chat) {
+      @for (mensaje of chat.mensajes; track mensaje.id; let i = $index) {
+        @if (i === 0 || fecha(mensaje.creadoEn) !== fecha(chat.mensajes[i - 1].creadoEn)) { <p class="dia">{{ fecha(mensaje.creadoEn) }}</p> }
+        <article class="mensaje" [class.propio]="mensaje.emisorId === chat.usuarioId"><span class="nombre">{{ mensaje.emisorNombre }} · {{ mensaje.emisorRol === 'viajero' ? 'A' : 'B' }}</span><p>{{ mensaje.contenido }}</p><time [attr.datetime]="mensaje.creadoEn">{{ hora(mensaje.creadoEn) }}</time></article>
+      } @empty { <div class="vacio"><span class="burbuja" aria-hidden="true">✦</span><h2>Hablemos de tu próxima historia</h2><p>Escribe tu primer mensaje para comenzar la conversación con Meridian.</p></div> }
+      @if (chat.mensajes.length === 200) { <p class="nota">Se muestran los 200 mensajes más recientes. Los contadores incluyen todo tu historial visible.</p> }
+    }
+  </section>
+  @if (sala(); as chat) {
+    <footer class="redactor"><label for="emisor-chat">Emisor en este dispositivo</label><select id="emisor-chat" [value]="chat.rolPropio"><option value="viajero" [disabled]="chat.rolPropio !== 'viajero'">Dispositivo A — {{ chat.viajeroNombre }}</option><option value="asesor" [disabled]="chat.rolPropio !== 'asesor'">Dispositivo B — {{ chat.asesorNombre }}</option></select><p class="nota">Solo puedes enviar con tu sesión. El otro participante responde desde su propia cuenta.</p>
+      <form (ngSubmit)="enviar()"><label for="mensaje-chat" class="sr-only">Escribir mensaje</label><textarea id="mensaje-chat" name="mensaje" [(ngModel)]="texto" maxlength="1000" rows="2" [disabled]="enviando() || incierto() || limpiando()" placeholder="¿En qué podemos ayudarte con tu viaje?"></textarea><button class="enviar" type="submit" [disabled]="enviando() || limpiando()">{{ enviando() ? 'Enviando...' : incierto() ? 'Reintentar' : 'Enviar →' }}</button></form><div class="contador">{{ texto.length }}/1000 caracteres</div>
+    </footer>
+  }
+</div>
+<dialog #dialogo (cancel)="limpiando() && $event.preventDefault()"><h2>¿Limpiar tu historial?</h2><p>Se ocultarán los mensajes anteriores para tu cuenta y se reiniciarán tus contadores. La otra persona conservará su conversación. Los mensajes nuevos seguirán apareciendo.</p><div><button type="button" [disabled]="limpiando()" (click)="cancelarLimpiar()">Cancelar</button><button class="confirmar" type="button" [disabled]="limpiando()" (click)="limpiar()">{{ limpiando() ? 'Limpiando...' : 'Sí, limpiar' }}</button></div></dialog>

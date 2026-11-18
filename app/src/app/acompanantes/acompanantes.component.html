@@ -1,0 +1,40 @@
+@if (!integrado) {
+<section class="hero"><p class="eyebrow">Prepara tu viaje</p><h1>Nos vamos a <span>{{ destino }}</span></h1><p>Registra o actualiza a las personas que viajarán contigo.</p><span class="local">Acompañantes guardados en este dispositivo</span></section>
+}
+<main [class.integrado]="integrado">
+  @if (!integrado) {
+  <a class="volver" routerLink="/destinos">← Volver a destinos</a>
+  <p class="nota-viaje">Prepara aquí los datos de tus acompañantes. Guardarlos no confirma una reserva ni envía una cotización.</p>
+  }
+  <section class="panel" id="form-acompanante" aria-labelledby="form-titulo">
+    <p class="eyebrow">Un lugar para cada viajero</p><h2 id="form-titulo">{{ editarId() === null ? 'Registrar acompañante' : 'Editar acompañante' }}</h2>
+    <p class="nota">Estos perfiles se guardan en este teléfono y no crean cuentas de acceso.</p>
+    <form #form="ngForm" (ngSubmit)="guardar(form)">
+      <fieldset [disabled]="ocupado()">
+        <label for="nombre-acompanante">Nombre completo</label><input id="nombre-acompanante" name="nombre" [(ngModel)]="datos.nombre" required maxlength="100" autocomplete="name" placeholder="Nombre del viajero">
+        <label for="edad-acompanante">Edad</label><input id="edad-acompanante" name="edad" type="number" [(ngModel)]="datos.edad" required min="1" max="120" step="1" placeholder="Edad en años">
+        <div class="acciones"><button class="primario" type="submit">{{ editarId() === null ? 'Registrar usuario' : 'Guardar cambios' }}</button>@if (editarId() !== null) { <button type="button" class="secundario" (click)="cancelar(form)">Cancelar edición</button> }</div>
+      </fieldset>
+    </form>
+  </section>
+  <div class="avisos" aria-live="polite">@if (ocupado()) { <p class="carga" role="status"><span class="spinner" aria-hidden="true"></span>Procesando...</p> } @if (error()) { <p class="error" role="alert">{{ error() }}</p> } @if (mensaje()) { <p class="exito">{{ mensaje() }}</p> }</div>
+  <section class="panel" aria-labelledby="lista-titulo">
+    <div class="lista-header"><div><p class="eyebrow">Tu agenda local</p><h2 id="lista-titulo">Mis acompañantes</h2></div>@if (consultado()) { <span class="contador">{{ usuarios().length }}</span> }</div>
+    <button class="consultar" type="button" [disabled]="ocupado()" (click)="consultar()">VER usuarios</button>
+    <div class="lista">
+      @if (!consultado()) { <p class="vacio">Presiona VER usuarios para consultar los acompañantes guardados.</p> }
+      @else {
+        @for (usuario of usuarios(); track usuario.id) {
+          <article class="viajero">
+            @if (integrado) { <label class="seleccionar"><input type="checkbox" [checked]="estaSeleccionado(usuario.id)" [disabled]="ocupado()" (change)="seleccionar(usuario)"> Incluir en este viaje</label> }<div class="identidad"><span class="avatar" aria-hidden="true">{{ usuario.nombre.charAt(0).toUpperCase() }}</span><div><span class="folio">Viajero #{{ usuario.id }}</span><h3>{{ usuario.nombre }}</h3></div></div>
+            <dl><div><dt>Edad</dt><dd>{{ usuario.edad }} años</dd></div></dl>
+            <div class="acciones"><button class="secundario" type="button" [disabled]="ocupado()" (click)="editar(usuario, form)" [attr.aria-label]="'Editar a ' + usuario.nombre">Editar</button><button class="borrar" type="button" [disabled]="ocupado()" (click)="eliminarPendiente.set(usuario)" [attr.aria-label]="'Eliminar a ' + usuario.nombre">Eliminar</button></div>
+          </article>
+        } @empty { <p class="vacio">Aún no hay acompañantes. Registra al primero en el formulario.</p> }
+      }
+    </div>
+  </section>
+  @if (eliminarPendiente(); as usuario) {
+    <section class="confirmacion panel" role="alertdialog" aria-labelledby="eliminar-titulo" aria-describedby="eliminar-texto"><h2 id="eliminar-titulo">¿Eliminar acompañante?</h2><p id="eliminar-texto">Se eliminará a {{ usuario.nombre }} de este dispositivo. Esta acción no se puede deshacer.</p><div class="acciones"><button class="borrar" type="button" [disabled]="ocupado()" (click)="eliminar(form)">Sí, eliminar</button><button class="secundario" type="button" [disabled]="ocupado()" (click)="eliminarPendiente.set(null)">Conservar</button></div></section>
+  }
+</main>

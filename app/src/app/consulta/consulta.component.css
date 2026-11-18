@@ -1,125 +1,392 @@
-.consulta-container {
+:host {
+  --navy: #0a1628;
+  --navy-mid: #163050;
+  --turquesa: #00d4ff;
+  --turquesa-dim: rgba(0, 212, 255, 0.15);
+  --white: #ffffff;
+  --gray: #8899aa;
+  --gray-light: #c8d4e0;
+  --green: #22c55e;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  display: block;
+  background: #f0f4f8;
   min-height: 100vh;
-  background-color: #0a1628;
+  font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ===== HERO ===== */
+.mv-hero {
+  background: linear-gradient(135deg, #0a1628 0%, #163050 60%, #0d2040 100%);
+  padding: 80px 24px 48px;
+  text-align: center;
+}
+
+.mv-eyebrow {
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--turquesa);
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+.mv-titulo {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--white);
+  margin: 0 0 10px;
+  letter-spacing: -0.5px;
+}
+
+.mv-subtitulo {
+  font-size: 14px;
+  color: var(--gray-light);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===== GEOLOCALIZACIÓN ===== */
+.geo-seccion {
+  padding: 20px 16px 0;
+}
+
+.geo-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 18px 16px 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.geo-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.geo-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--turquesa-dim);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
-.consulta-card {
-  background-color: #0d1f38;
+.geo-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--turquesa);
+}
+
+.geo-texto {
+  flex: 1;
+}
+
+.geo-ciudad {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a2a3a;
+  margin: 0 0 2px;
+}
+
+.geo-ciudad strong {
+  color: var(--navy);
+}
+
+.geo-sub {
+  font-size: 12px;
+  color: var(--gray);
+  margin: 0;
+}
+
+.geo-estado {
+  font-size: 13px;
+  color: var(--gray);
+  margin: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.geo-error {
+  font-size: 12px;
+  color: var(--red);
+  margin: 4px 0 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.btn-geo-refresh {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-geo-refresh svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gray);
+}
+
+/* Scroll horizontal de sugeridos */
+.sugeridos-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.sugeridos-scroll::-webkit-scrollbar { display: none; }
+
+.sugerido-card {
+  flex-shrink: 0;
+  width: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f0f4f8;
+  scroll-snap-align: start;
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  transition: transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sugerido-card:active { transform: scale(0.97); }
+
+.sugerido-img {
+  height: 90px;
+  background-size: cover;
+  background-position: center;
+  background-color: #c8d4e0;
+  position: relative;
+}
+
+.sugerido-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.sugerido-info {
+  padding: 8px 10px;
+}
+
+.sugerido-nombre {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a2a3a;
+  margin: 0 0 1px;
+}
+
+.sugerido-pais {
+  font-size: 11px;
+  color: var(--gray);
+  margin: 0 0 4px;
+}
+
+.sugerido-precio {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0;
+}
+
+/* ===== COTIZACIONES ===== */
+.cotizaciones-seccion {
+  padding: 24px 16px 32px;
+}
+
+.seccion-header {
+  margin-bottom: 16px;
+}
+
+.seccion-titulo {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0;
+}
+
+/* Estado vacío */
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--white);
   border-radius: 16px;
-  padding: 40px 32px;
-  width: 100%;
-  max-width: 380px;
-  border: 1px solid rgba(0, 212, 255, 0.2);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
-.logo {
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--turquesa);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.vacio-icon {
+  width: 52px;
+  height: 52px;
+  color: #c8d4e0;
+  margin-bottom: 16px;
+}
+
+.vacio-titulo {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a2a3a;
+  margin: 0 0 6px;
+}
+
+.vacio-sub {
+  font-size: 13px;
+  color: var(--gray);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.btn-explorar {
+  background: var(--navy);
+  color: var(--turquesa);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Lista de cotizaciones */
+.cotizaciones-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cotizacion-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+
+.cotizacion-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.cotizacion-destino {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 24px;
 }
 
-.logo-letter {
-  color: #00d4ff;
-  font-size: 28px;
+.plane-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--navy);
+  flex-shrink: 0;
+}
+
+.destino-nombre {
+  font-size: 15px;
   font-weight: 700;
+  color: #1a2a3a;
 }
 
-.logo-text {
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 500;
+/* Badges de estado */
+.estado-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: capitalize;
 }
 
-h2 {
-  color: #ffffff;
-  font-size: 22px;
+.estado-pendiente  { background: #fef3c7; color: #92400e; }
+.estado-aprobada   { background: #dcfce7; color: #166534; }
+.estado-rechazada  { background: #fee2e2; color: #991b1b; }
+.estado-en_proceso { background: #dbeafe; color: #1e40af; }
+
+.cotizacion-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 8px;
 }
 
-.url {
-  color: #8899aa;
-  font-size: 12px;
-  word-break: break-all;
-  margin-bottom: 24px;
-}
-
-.btn {
-  width: 100%;
-  padding: 14px;
-  background-color: #00d4ff;
-  color: #0a1628;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.cargando {
-  color: #00d4ff;
-  font-size: 14px;
-  margin-top: 16px;
-}
-
-.error {
-  color: #ff4d4d;
-  font-size: 14px;
-  margin-top: 16px;
-}
-
-.respuesta {
-  margin-top: 20px;
-  padding: 16px;
-  background-color: #0a1628;
-  border: 1px solid rgba(0, 212, 255, 0.3);
-  border-radius: 8px;
-}
-
-.total {
-  color: #8899aa;
-  font-size: 12px;
-  margin: 0 0 12px;
-}
-
-.campo {
+.meta-fecha {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 12px;
-}
-
-.campo:last-child {
-  margin-bottom: 0;
-}
-
-.campo-nombre {
-  color: #00d4ff;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
-  text-transform: uppercase;
+  color: var(--gray);
 }
 
-.campo-valor {
-  color: #ffffff;
-  font-size: 14px;
-  word-break: break-word;
+.meta-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--gray);
 }
 
-.volver {
-  display: block;
-  margin-top: 20px;
-  text-align: center;
-  color: #00d4ff;
-  font-size: 14px;
-  text-decoration: none;
+.meta-precio {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
 }
+
+.cotizacion-mensaje {
+  font-size: 13px;
+  color: #475569;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid #f1f5f9;
+  line-height: 1.5;
+}
+
+.seccion-header{display:flex;align-items:center;justify-content:space-between;gap:12px}.btn-actualizar{border:1px solid #cedce7;background:white;color:#163050;border-radius:10px;padding:10px 14px;font:inherit;font-size:12px;cursor:pointer}.btn-actualizar:disabled{opacity:.5}.detalle-viaje{padding:12px 0;border-top:1px solid #edf2f7;color:#526c80;overflow-wrap:anywhere}.detalle-viaje p,.detalle-viaje li{font-size:12px;line-height:1.8;margin:4px 0}.detalle-viaje summary{cursor:pointer;font-size:12px;font-weight:600;padding:8px 0;color:#167b90}.detalle-viaje ul{padding-left:20px}.estado-enviada{background:#dbeafe;color:#1e40af}.estado-en_revision{background:#fef3c7;color:#92400e}.estado-respondida{background:#e5defa;color:#5b2e91}.estado-agendada{background:#dcfce7;color:#166534}.estado-cerrada{background:#e2e8f0;color:#475569}
+
+.btn-chat{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;margin-top:12px;text-decoration:none;background:#12334e;color:#8ce0eb;border-radius:12px;font-size:12px;font-weight:600}.btn-chat:focus-visible{outline:3px solid #6ac8dc;outline-offset:3px}
+
+.nota-cotizacion{font-size:12px;line-height:1.7;color:#64788a;margin:0 0 18px}
+
+.estado-reserva-confirmada { background: #dcfce7; color: #166534; }
+.reserva-confirmada { background: #edf9f0; color: #175639; padding: .75rem; border-radius: 10px; }
+.reserva-acciones { margin-top: .75rem; color: #163050; font-size: .875rem; }
+.reserva-acciones p { margin: 0 0 .5rem; }
+.reserva-acciones button + button { margin-left: .5rem; }
