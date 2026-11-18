@@ -1,0 +1,62 @@
+waiting for server to start.... done
+server started
+Tue Nov 17 18:09:08 CST 2026
+v24.18.0
+psql (PostgreSQL) 16.14 (Homebrew)
+
+> meridian-app@0.0.0 test
+> ng test --watch=false
+
+❯ Building...
+✔ Building...
+Application bundle generation complete. [0.694 seconds] - 2026-11-18T00:09:09.031Z
+
+
+ RUN  v5.0.2 /Users/mac/meridian-mobile/app
+
+
+ Test Files  12 passed (12)
+      Tests  82 passed (82)
+   Start at  18:09:09
+   Duration  935ms (environment 60%, setup 21%, transform 9%, tests 5%, import 5%, worker 1%)
+
+
+real	0m1.986s
+user	0m8.897s
+sys	0m1.291s
+DO
+CREATE SCHEMA
+CREATE TABLE
+CREATE FUNCTION
+CREATE FUNCTION
+GRANT
+GRANT
+CREATE TABLE
+CREATE TABLE
+BEGIN
+ALTER TABLE
+CREATE INDEX
+CREATE FUNCTION
+CREATE FUNCTION
+REVOKE
+REVOKE
+GRANT
+GRANT
+COMMIT
+NOTIFY
+BEGIN
+CREATE FUNCTION
+COMMIT
+NOTIFY
+BEGIN
+INSERT 0 1
+INSERT 0 1
+SET
+SET
+psql:practica13-14/persistencia.sql:43: NOTICE:  AUT-06 aprobado. El reenvío reutilizó el identificador y quedó exactamente una cotización.
+DO
+ROLLBACK
+
+real	0m0.026s
+user	0m0.007s
+sys	0m0.006s
