@@ -26,6 +26,8 @@ GitHub Actions ejecuta la suite y la comprobación SQL en cada push y pull reque
 
 La primera ejecución, activada al publicar el flujo, aprobó la suite Angular y la comprobación PostgreSQL. El trabajo duró **34 s**, incluida la preparación del entorno. [Primera ejecución](https://github.com/Cinthya-Garcia25/meridian-mobile/actions/runs/44205532964).
 
+El segundo push publicó el reporte y la matriz. GitHub Actions volvió a ejecutar ambos pasos y aprobó en **41 s**. [Segunda ejecución](https://github.com/Cinthya-Garcia25/meridian-mobile/actions/runs/44205734798).
+
 ## Conclusión técnica
 
 La automatización permite comprobar después de cada cambio que una solicitud válida se confirma, que la aplicación distingue un rechazo de sesión de un resultado incierto y que el reenvío mantiene una sola cotización. Verificar el cliente y la persistencia en cada push permite detectar regresiones tanto en el contrato de la RPC como en el almacenamiento. Las respuestas del transporte se simulan y el esquema SQL es de laboratorio, por lo que las mediciones corresponden a ese alcance.
